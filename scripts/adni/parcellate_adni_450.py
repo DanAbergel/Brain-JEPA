@@ -11,6 +11,7 @@ Usage:
 """
 
 import os
+import urllib.request
 import torch
 import numpy as np
 import nibabel as nib
@@ -21,8 +22,22 @@ from pathlib import Path
 DATA_ROOT = Path("/sci/nosnap/arieljaffe/sagi.nathan/shared_fmri_data")
 LAB_DIR = Path("/sci/labs/arieljaffe/dan.abergel1")
 OUTPUT_PATH = LAB_DIR / "data" / "adni_parcellated_450.pt"
+NILEARN_DATA_DIR = str(LAB_DIR / "cache" / "nilearn_data")
 
-os.environ["NILEARN_DATA"] = str(LAB_DIR / "cache" / "nilearn_data")
+os.environ["NILEARN_DATA"] = NILEARN_DATA_DIR
+
+TIAN_S3_URL = "https://github.com/yetianmed/subcortex/raw/master/Group-Parcellation/3T/Subcortex-Only/Tian_Subcortex_S3_3T_1mm.nii.gz"
+
+
+def fetch_tian_s3():
+    """Download Tian S3 atlas if not already cached."""
+    cache_dir = os.path.join(NILEARN_DATA_DIR, "tian_2020")
+    os.makedirs(cache_dir, exist_ok=True)
+    local_path = os.path.join(cache_dir, "Tian_Subcortex_S3_3T_1mm.nii.gz")
+    if not os.path.exists(local_path):
+        print("  Downloading Tian S3 atlas from GitHub...")
+        urllib.request.urlretrieve(TIAN_S3_URL, local_path)
+    return local_path
 
 
 def fetch_and_resample(atlas_img, data_affine, target_shape):
@@ -54,9 +69,8 @@ def main():
 
     # 2. Fetch Tian S3 subcortical atlas (50 ROIs)
     print("Fetching Tian S3 subcortical atlas (50 ROIs) ...")
-    tian = datasets.fetch_atlas_tian_2020(resolution_mm=2)
-    # S3 = scale III = 50 regions
-    tian_img = nib.load(tian.maps[2])  # Scale III
+    tian_path = fetch_tian_s3()
+    tian_img = nib.load(tian_path)
     tian_labels = fetch_and_resample(tian_img, data_affine, (X, Y, Z))
 
     tian_regions = np.unique(tian_labels)

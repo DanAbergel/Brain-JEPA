@@ -180,12 +180,33 @@ def evaluate(args, data_loader, model, device, task):
         gt = np.concatenate(gt_all)
         predict_class = np.concatenate(predict_class_all, axis=0)
         predict = np.argmax(predict_class, axis=1)
-        
+        probs = predict_class[:, 1] if predict_class.shape[1] == 2 else predict_class
+
         f1 = f1_score(gt, predict)
-        metric_logger.update(f1=f1.item())
-        
-        print('* Acc@1 {top1.global_avg:.3f} loss {losses.global_avg:.3f} F1 {f1.global_avg:.3f}'
-            .format(top1=metric_logger.acc1, losses=metric_logger.loss, f1=metric_logger.f1))
+        prec = precision_score(gt, predict, zero_division=0)
+        rec = recall_score(gt, predict, zero_division=0)
+        try:
+            auc = roc_auc_score(gt, probs)
+        except ValueError:
+            auc = 0.0
+
+        # sensitivity = recall, specificity = TN / (TN + FP)
+        tp = ((predict == 1) & (gt == 1)).sum()
+        tn = ((predict == 0) & (gt == 0)).sum()
+        fp = ((predict == 1) & (gt == 0)).sum()
+        fn = ((predict == 0) & (gt == 1)).sum()
+        sensitivity = float(tp) / (tp + fn) if (tp + fn) > 0 else 0.0
+        specificity = float(tn) / (tn + fp) if (tn + fp) > 0 else 0.0
+
+        metric_logger.update(f1=float(f1))
+        metric_logger.update(precision=float(prec))
+        metric_logger.update(recall=float(rec))
+        metric_logger.update(auc=float(auc))
+        metric_logger.update(sensitivity=float(sensitivity))
+        metric_logger.update(specificity=float(specificity))
+
+        print('* Acc@1 {top1.global_avg:.3f} loss {losses.global_avg:.3f} F1 {f1.global_avg:.3f} AUC {auc.global_avg:.3f}'
+            .format(top1=metric_logger.acc1, losses=metric_logger.loss, f1=metric_logger.f1, auc=metric_logger.auc))
     else:
         target = torch.from_numpy(np.concatenate(gt_all))
         output = torch.from_numpy(np.concatenate(predict_class_all, axis=0)).float()

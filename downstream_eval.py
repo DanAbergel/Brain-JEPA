@@ -75,6 +75,10 @@ def get_args_parser():
     
     parser.add_argument('--output_root', type=str, default='',
                         help='load_dataset')
+    parser.add_argument('--processed_dir', type=str, default='',
+                        help='path to processed data directory')
+    parser.add_argument('--horizon', type=str, default='1y',
+                        help='degradation horizon: 1y, 2y, or 3y')
     
     return parser
 
