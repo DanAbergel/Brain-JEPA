@@ -76,7 +76,7 @@ def main():
 
     for label in LABELS:
         h = HORIZON_MAP[label]
-        log_path = Path(output_root) / f'degradation_{h}' / 'fine_tune' / 'adni_degradation' / 'jepa-ep300' / 'ft_log' / 'log.txt'
+        log_path = Path(output_root) / f'degradation_{h}' / 'fine_tune' / 'adni_degradation' / 'jepa-ep300' / 'ft_output' / 'log.txt'
 
         if not log_path.exists():
             print(f"  {label:<30}   (no results)")
