@@ -10,7 +10,7 @@
 #   3 parallel fine-tuning jobs + 1 summary job that waits for all 3
 # =====================================================================
 
-set -euo pipefail
+set -eo pipefail
 
 PROJECT_DIR="/sci/labs/arieljaffe/dan.abergel1/repos/Brain-JEPA"
 cd "$PROJECT_DIR"

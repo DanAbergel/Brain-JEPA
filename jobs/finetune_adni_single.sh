@@ -25,7 +25,7 @@ CKPT="$PROJECT_DIR/logs/pretrained/BrainJEPA-Checkpoints/Pretraining/jepa-ep300.
 
 mkdir -p "$PROJECT_DIR/logs"
 
-echo "=== Fine-tuning degradation_${HORIZON} — Job $SLURM_JOB_ID on $(hostname) ==="
+echo "=== Fine-tuning degradation_${HORIZON} — Job ${SLURM_JOB_ID:-local} on $(hostname) ==="
 
 source "$VENV_DIR/bin/activate"
 cd "$PROJECT_DIR"
