@@ -10,7 +10,7 @@
 #SBATCH --mem=32G
 #SBATCH --partition=salmon
 #SBATCH --gres=gpu:l40s:1
-#SBATCH --time=04:00:00
+#SBATCH --time=06:00:00
 #SBATCH --output=logs/finetune_adni_%x_%j.out
 #SBATCH --error=logs/finetune_adni_%x_%j.err
 
