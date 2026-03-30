@@ -46,8 +46,11 @@ def load_log(log_path):
     with open(log_path) as f:
         for line in f:
             line = line.strip()
-            if line:
-                entries.append(json.loads(line))
+            if line and line.startswith('{'):
+                try:
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
     return entries
 
 
